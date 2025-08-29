@@ -4,51 +4,43 @@ import readline from "node:readline";
 
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
 })
 
-async function readCmd(cmd: string) {
-    return new Promise(resolve => {
-        rl.question(cmd, result => resolve(result));
-    })
+function updatePrompt() {
+    rl.setPrompt(`[${cwd()}]$ `);
+    rl.prompt();
 }
 
 function execCmd(result: any) {
      exec(result, (error, stdout, stderr) => {
         if (error) {
             console.error(`ERROR: ${error.message}`);
-            return;
         }
-
-        if (stderr) {
+        else if (stderr) {
             console.error(`STDERR: ${stderr}`);
-            return;
+        }
+        else {
+            console.log(stdout);
         }
 
-        console.log(`${stdout}`);
-        return;
+        updatePrompt();
     })   
 }
 
-async function main() {
-    
-    let quit: boolean = false;
+rl.on("line", (line) => {
+    const cmd = line.trim()
 
-    while(!quit) {
-        const result = await readCmd(`${cwd()} $ `);
-
-        switch(result) {
-            case "exit":
-                quit = true;
-                break;
-            default:
-                execCmd(result);
-                break;
-        }
+    switch(cmd) {
+        case "exit":
+            rl.close();
+            process.exit(0);
+            break;
+        default:
+            if (cmd != "") {
+                execCmd(cmd);
+            }
+            break;
     }
-
-    rl.close();
-    process.exit(0);
-}
-
-main();
+})
+ updatePrompt();
