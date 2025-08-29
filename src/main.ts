@@ -9,11 +9,11 @@ const rl = readline.createInterface({
 
 async function readCmd(cmd: string) {
     return new Promise(resolve => {
-        rl.question(cmd, result => resolve(result))
+        rl.question(cmd, result => resolve(result));
     })
 }
 
-function execCmd(result: string) {
+function execCmd(result: any) {
      exec(result, (error, stdout, stderr) => {
         if (error) {
             console.error(`ERROR: ${error.message}`);
